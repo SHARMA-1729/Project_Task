@@ -1,0 +1,21 @@
+{
+  "name": "truestate_retail_sales-backend",
+  "version": "0.1.0",
+  "main": "src/index.js",
+  "private": true,
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "ingest": "node src/utils/data.ingestion.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "csv-parser": "^3.2.0",
+    "dotenv": "^17.2.3",
+    "express": "^4.22.1",
+    "pg": "^8.16.3"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
+  }
+}
