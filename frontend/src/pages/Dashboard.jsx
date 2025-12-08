@@ -1,137 +1,108 @@
-
-
-
-// src/pages/Dashboard.jsx
-import React, { useMemo, useState } from "react";
-import Sidebar from "../components/Sidebar.jsx";
+import React, { useState, useMemo } from "react";
 import SearchBar from "../components/SearchBar.jsx";
 import FiltersPanel from "../components/FiltersPanel.jsx";
 import SalesTable from "../components/SalesTable.jsx";
 import PaginationControls from "../components/PaginationControls.jsx";
 import useSalesData from "../hooks/useSalesData.js";
 
+const DEFAULT_FILTERS = {
+  region: "",
+  gender: "",
+  age: "",
+  productCategory: "",
+  tags: "",
+  paymentMethod: "",
+  dateFrom: "",
+  dateTo: "",
+};
+
 export default function Dashboard() {
   const [search, setSearch] = useState("");
-  const [filters, setFilters] = useState({
-    region: [],
-    gender: [],
-    ageMin: "",
-    ageMax: "",
-    productCategory: [],
-    tags: [],
-    paymentMethod: [],
-    dateFrom: "",
-    dateTo: "",
-  });
-
-  const [sort, setSort] = useState({
-    sortBy: "customer_name",
-    sortOrder: "asc",
-  });
-
+  const [filters, setFilters] = useState({ ...DEFAULT_FILTERS });
+  const [sort, setSort] = useState({ sortBy: "date", sortOrder: "desc" });
   const [page, setPage] = useState(1);
 
-  const { data = [], pagination, loading, error } = useSalesData({
+  const resetFilters = () => {
+    setFilters({ ...DEFAULT_FILTERS });
+  };
+
+  const { data, pagination, loading, error } = useSalesData({
     search,
     filters,
     sort,
     page,
   });
 
-  // Simple stats based on current page
   const stats = useMemo(() => {
-    if (!data || data.length === 0) {
-      return {
-        totalUnits: 0,
-        totalAmount: 0,
-        totalDiscount: 0,
-        discountSrs: 0,
-        recordsCount: 0,
-      };
-    }
+    if (!data || data.length === 0)
+      return { units: 0, totalAmount: 0, totalDiscount: 0 };
 
-    let totalUnits = 0;
+    let units = 0;
     let totalAmount = 0;
     let totalDiscount = 0;
 
-    for (const row of data) {
-      const qty = Number(row.quantity || 0);
-      const finalAmount = Number(row.final_amount || row.total_amount || 0);
-      const gross = Number(row.total_amount || finalAmount);
+    data.forEach((row) => {
+      const q = Number(row.quantity || 0);
+      const finalAmt = Number(row.final_amount || 0);
+      const totalAmt = Number(row.total_amount || finalAmt);
 
-      totalUnits += qty;
-      totalAmount += finalAmount;
-      totalDiscount += Math.max(gross - finalAmount, 0);
-    }
+      units += q;
+      totalAmount += finalAmt;
+      totalDiscount += totalAmt - finalAmt;
+    });
 
-    return {
-      totalUnits,
-      totalAmount,
-      totalDiscount,
-      recordsCount: data.length,
-      discountSrs: data.length, // just mimic "xx SRs"
-    };
+    return { units, totalAmount, totalDiscount };
   }, [data]);
 
   return (
-    <div className="min-h-screen bg-slate-50 flex">
-      {/* Left sidebar */}
-      <Sidebar />
+    <div className="dashboard-container">
+      <div className="dashboard-header-row">
+        <h1 className="dashboard-title">Sales Management System</h1>
+        <SearchBar value={search} onChange={setSearch} />
+      </div>
 
-      {/* Right main content */}
-      <div className="flex-1 flex flex-col">
-        {/* Header */}
-        <header className="border-b border-slate-200 bg-white">
-          <div className="flex items-center justify-between px-6 py-4">
-            <h2 className="text-md font-semibold text-slate-900">
-              Sales Management System
-            </h2>
-            <SearchBar value={search} onChange={setSearch} />
+      <div className="dashboard-filters-row">
+        <FiltersPanel
+          filters={filters}
+          sort={sort}
+          onChange={setFilters}
+          onSortChange={setSort}
+          onReset={resetFilters}
+        />
+      </div>
+
+      <div className="dashboard-summary-row">
+        <div className="summary-card">
+          <div className="summary-label">Total units sold</div>
+          <div className="summary-value">{stats.units}</div>
+        </div>
+
+        <div className="summary-card">
+          <div className="summary-label">Total Amount</div>
+          <div className="summary-value">
+            ₹{stats.totalAmount.toLocaleString("en-IN")}
           </div>
-        </header>
+        </div>
 
-        {/* Main content */}
-        <main className="flex-1 px-6 py-4 space-y-4">
-          {/* Filters + Stats */}
-          <FiltersPanel
-            filters={filters}
-            onChange={(next) => {
-              setFilters(next);
-              setPage(1); // reset page on filter change
-            }}
-            sort={sort}
-            onSortChange={(nextSort) => {
-              setSort(nextSort);
-              setPage(1);
-            }}
-            stats={stats}
-          />
+        <div className="summary-card">
+          <div className="summary-label">Total Discount</div>
+          <div className="summary-value">
+            ₹{stats.totalDiscount.toLocaleString("en-IN")}
+          </div>
+        </div>
+      </div>
 
-          {/* Table card */}
-          <section className="mt-2 rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-            {loading && (
-              <div className="py-10 text-center text-sm text-slate-500">
-                Loading…
-              </div>
-            )}
+      <div className="dashboard-table-block">
 
-            {error && !loading && (
-              <div className="py-10 text-center text-sm text-red-500">
-                Error loading data
-              </div>
-            )}
+        <div className="table-wrapper">
+          <SalesTable rows={data} />
+        </div>
 
-            {!loading && !error && (
-              <>
-                <SalesTable rows={data} />
-                <PaginationControls
-                  pagination={pagination}
-                  onPageChange={setPage}
-                />
-              </>
-            )}
-          </section>
-        </main>
+        <PaginationControls
+          pagination={pagination}
+          onPageChange={setPage}
+        />
+
       </div>
     </div>
   );

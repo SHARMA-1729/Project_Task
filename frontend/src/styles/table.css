@@ -1,0 +1,50 @@
+.table-wrapper {
+  width: 100%;
+  max-height: none;
+  overflow-x: auto;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--card-bg);
+  padding: 8px;
+  box-shadow: 0 1px 3px rgba(15,23,42,0.03);
+}
+
+.sales-table{
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 1050px;
+  font-size:13px;
+}
+.sales-table thead th{
+  padding:12px 14px;
+  text-align:left;
+  color:var(--muted);
+  font-weight:600;
+  font-size:13px;
+  background:#fafafa;
+  border-bottom:1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 3;
+}
+.sales-table th, .sales-table td{
+  padding:14px 14px;
+  border-bottom:1px solid #f1f5f9;
+  white-space:nowrap;
+  vertical-align: middle;
+}
+.sales-table tbody tr{background:transparent}
+.sales-table tbody tr:nth-child(even){background:#fbfbfd}
+.sales-table tbody tr:hover{background:#f7f9fe}
+.sales-table td:nth-child(1){color:#374151}
+.sales-table td:nth-child(10){font-weight:700}
+
+.table-wrapper::-webkit-scrollbar{width:10px;height:10px}
+.table-wrapper::-webkit-scrollbar-thumb{background:#d1d5db;border-radius:999px}
+
+@media (max-width:900px){
+  .table-wrapper{max-height: calc(100vh - 420px)}
+  .sales-table{font-size:13px;min-width:900px}
+}

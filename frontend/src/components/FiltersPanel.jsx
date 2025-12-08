@@ -1,319 +1,261 @@
-// import React, { useCallback } from "react";
-
-// const REGION = ["North", "South", "East", "West"];
-// const GENDER = ["Male", "Female", "Other"];
-
-// function FiltersPanel({ filters, onChange }) {
-  
-//   const updateField = useCallback((key, value) => {
-//     onChange(prev => ({
-//       ...prev,
-//       [key]: value
-//     }));
-//   }, [onChange]);
-
-//   return (
-//     <div className="filters">
-
-//       <div className="card">
-//         <label>Region</label>
-//         <select
-//           multiple
-//           value={filters.region}
-//           onChange={(e) =>
-//             updateField(
-//               "region",
-//               Array.from(e.target.selectedOptions).map((o) => o.value)
-//             )
-//           }
-//         >
-//           {REGION.map((r) => (
-//             <option key={r}>{r}</option>
-//           ))}
-//         </select>
-//       </div>
-
-//       <div className="card">
-//         <label>Gender</label>
-//         <select
-//           multiple
-//           value={filters.gender}
-//           onChange={(e) =>
-//             updateField(
-//               "gender",
-//               Array.from(e.target.selectedOptions).map((o) => o.value)
-//             )
-//           }
-//         >
-//           {GENDER.map((g) => (
-//             <option key={g}>{g}</option>
-//           ))}
-//         </select>
-//       </div>
-
-//       <div className="card two-col">
-//         <div>
-//           <label>Age Min</label>
-//           <input
-//             type="number"
-//             value={filters.ageMin}
-//             onChange={(e) => updateField("ageMin", e.target.value)}
-//           />
-//         </div>
-
-//         <div>
-//           <label>Age Max</label>
-//           <input
-//             type="number"
-//             value={filters.ageMax}
-//             onChange={(e) => updateField("ageMax", e.target.value)}
-//           />
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
-// export default React.memo(FiltersPanel);
-
-
-
-
-
-
-
-
-// src/components/FiltersPanel.jsx
-import React from "react";
+import React, { useRef } from "react";
 
 const REGION = ["North", "South", "East", "West"];
 const GENDER = ["Male", "Female", "Other"];
-const AGE_RANGES = [
-  { label: "All ages", value: "" },
-  { label: "18 - 25", value: "18-25" },
-  { label: "26 - 35", value: "26-35" },
-  { label: "36 - 50", value: "36-50" },
-  { label: "50+", value: "50-120" },
-];
-const PRODUCT_CATEGORY = [
-  "Electronics",
-  "Groceries",
+const AGE_RANGES = ["", "18-25", "26-35", "36-45", "46+"];
+const PRODUCT_CATEGORIES = [
   "Clothing",
-  "Home & Kitchen",
+  "Electronics",
+  "Furniture",
+  "Accessories",
+  "Beauty",
 ];
-const PAYMENT = ["Cash", "Card", "UPI", "Wallet"];
+const TAGS = ["New", "Sale", "Bestseller", "Limited", "Seasonal"];
+const PAYMENT_METHODS = ["Cash", "Card", "UPI", "Net Banking", "Wallet"];
+const SORT_OPTIONS = [
+  { label: "Date (Newest First)", sortBy: "date", sortOrder: "desc" },
+  { label: "Quantity", sortBy: "quantity", sortOrder: "desc" },
+  { label: "Customer Name (A-Z)", sortBy: "customer_name", sortOrder: "asc" },
+];
 
-export default function FiltersPanel({
-  filters,
-  onChange,
-  sort,
-  onSortChange,
-  stats,
-}) {
-  const safeFilters = filters || {};
-  const safeSort = sort || { sortBy: "date", sortOrder: "desc" };
+const FilterChip = ({ children, className = "", interactive = false }) => (
+  <div
+    className={`filter-chip ${interactive ? "filter-chip--interactive" : ""} ${className}`
+      .trim()
+      .replace(/\s+/g, " ")}
+  >
+    {children}
+  </div>
+);
 
-  const updateField = (key, value) => {
-    onChange({ ...safeFilters, [key]: value });
-  };
+const DateRangeField = ({ dateFrom, dateTo, onChange }) => {
+  const startRef = useRef(null);
+  const endRef = useRef(null);
 
-  const handleAgeRangeChange = (value) => {
-    if (!value) {
-      updateField("ageMin", "");
-      updateField("ageMax", "");
-      return;
+  const openPicker = (ref) => {
+    if (!ref.current) return;
+    if (typeof ref.current.showPicker === "function") {
+      ref.current.showPicker();
+    } else {
+      ref.current.focus();
+      ref.current.click();
     }
-    const [min, max] = value.split("-");
-    updateField("ageMin", min);
-    updateField("ageMax", max);
   };
 
-  const currentAgeRange = (() => {
-    const min = safeFilters.ageMin || "";
-    const max = safeFilters.ageMax || "";
-    if (!min || !max) return "";
-    return `${min}-${max}`;
-  })();
+  const updateField = (field, value) => {
+    const nextRange = {
+      dateFrom,
+      dateTo,
+      [field]: value,
+    };
+
+    if (nextRange.dateFrom && nextRange.dateTo) {
+      const startDate = new Date(nextRange.dateFrom);
+      const endDate = new Date(nextRange.dateTo);
+      if (startDate > endDate) {
+        if (field === "dateFrom") {
+          nextRange.dateTo = value;
+        } else {
+          nextRange.dateFrom = value;
+        }
+      }
+    }
+
+    onChange(nextRange);
+  };
 
   return (
-    <div className="space-y-4">
-      {/* Filters row */}
-      <div className="flex flex-wrap items-center gap-5 p-4 border border-red-500">
-        {/* Reset button */}
-        <button
-          type="button"
-          className="inline-flex items-center gap-1 px-3 py-2 text-xs font-medium bg-white border border-2 border-red-500 rounded-lg border-slate-300 text-slate-600 hover:bg-slate-100"
-          onClick={() =>
-            onChange({
-              region: [],
-              gender: [],
-              ageMin: "",
-              ageMax: "",
-              productCategory: [],
-              tags: [],
-              paymentMethod: [],
-              dateFrom: "",
-              dateTo: "",
-            })
-          }
+    <FilterChip className="filter-chip--date-range">
+      <span className="date-chip-label">Date</span>
+      <div className="date-range-box">
+        <div className="date-input-wrapper">
+          <div className="date-input-shell">
+            <input
+              ref={startRef}
+              type="date"
+              value={dateFrom || ""}
+              onChange={(e) => updateField("dateFrom", e.target.value)}
+              aria-label="Start date"
+              title="Start date"
+            />
+            <button
+              type="button"
+              className="date-input-arrow"
+              onClick={() => openPicker(startRef)}
+              aria-label="Open start date picker"
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true">
+                <path fill="currentColor" d="M7 10l5 5 5-5z" />
+              </svg>
+            </button>
+          </div>
+        </div>
+        <span className="date-range-divider" aria-hidden="true">
+          —
+        </span>
+        <div className="date-input-wrapper">
+          <div className="date-input-shell">
+            <input
+              ref={endRef}
+              type="date"
+              value={dateTo || ""}
+              onChange={(e) => updateField("dateTo", e.target.value)}
+              aria-label="End date"
+              title="End date"
+            />
+            <button
+              type="button"
+              className="date-input-arrow"
+              onClick={() => openPicker(endRef)}
+              aria-label="Open end date picker"
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true">
+                <path fill="currentColor" d="M7 10l5 5 5-5z" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </FilterChip>
+  );
+};
+
+export default function FiltersPanel({ filters, sort, onChange, onSortChange, onReset }) {
+  const updateField = (key, value) => {
+    onChange({ ...filters, [key]: value });
+  };
+
+  const selectClass = (value) =>
+    value ? "filter-chip-select" : "filter-chip-select filter-chip-select--placeholder";
+
+  return (
+    <div className="filters-inline">
+      <button
+        type="button"
+        className="filter-reset"
+        onClick={onReset}
+        aria-label="Reset filters"
+      >
+        ↻
+      </button>
+
+      <FilterChip interactive>
+        <select
+          className={selectClass(filters.region)}
+          value={filters.region}
+          onChange={(e) => updateField("region", e.target.value)}
         >
-          ⟳
-         
-        </button>
+          <option value="">Customer Region</option>
+          {REGION.map((r) => (
+            <option key={r} value={r}>
+              {r}
+            </option>
+          ))}
+        </select>
+      </FilterChip>
 
-        <FilterSelect
-          label="Customer Region"
-          value={safeFilters.region?.[0] || ""}
-          onChange={(val) =>
-            updateField("region", val ? [val] : [])
-          }
-          options={REGION}
-        />
+      <FilterChip interactive>
+        <select
+          className={selectClass(filters.gender)}
+          value={filters.gender}
+          onChange={(e) => updateField("gender", e.target.value)}
+        >
+          <option value="">Gender</option>
+          {GENDER.map((g) => (
+            <option key={g} value={g}>
+              {g}
+            </option>
+          ))}
+        </select>
+      </FilterChip>
 
-        <FilterSelect
-          label="Gender"
-          value={safeFilters.gender?.[0] || ""}
-          onChange={(val) =>
-            updateField("gender", val ? [val] : [])
-          }
-          options={GENDER}
-        />
+      <FilterChip interactive>
+        <select
+          className={selectClass(filters.age)}
+          value={filters.age}
+          onChange={(e) => updateField("age", e.target.value)}
+        >
+          <option value="">Age Range</option>
+          {AGE_RANGES.filter(Boolean).map((a) => (
+            <option key={a} value={a}>
+              {a}
+            </option>
+          ))}
+        </select>
+      </FilterChip>
 
-        <FilterSelect
-          label="Age Range"
-          value={currentAgeRange}
-          onChange={handleAgeRangeChange}
-          options={AGE_RANGES.map((r) => r.label)}
-          mapLabelToValue={(label) =>
-            AGE_RANGES.find((r) => r.label === label)?.value || ""
-          }
-        />
+      <FilterChip interactive>
+        <select
+          className={selectClass(filters.productCategory)}
+          value={filters.productCategory}
+          onChange={(e) => updateField("productCategory", e.target.value)}
+        >
+          <option value="">Product Category</option>
+          {PRODUCT_CATEGORIES.map((p) => (
+            <option key={p} value={p}>
+              {p}
+            </option>
+          ))}
+        </select>
+      </FilterChip>
 
-        <FilterSelect
-          label="Product Category"
-          value={safeFilters.productCategory?.[0] || ""}
-          onChange={(val) =>
-            updateField("productCategory", val ? [val] : [])
-          }
-          options={PRODUCT_CATEGORY}
-        />
+      <FilterChip interactive>
+        <select
+          className={selectClass(filters.tags)}
+          value={filters.tags}
+          onChange={(e) => updateField("tags", e.target.value)}
+        >
+          <option value="">Tags</option>
+          {TAGS.map((tag) => (
+            <option key={tag} value={tag}>
+              {tag}
+            </option>
+          ))}
+        </select>
+      </FilterChip>
 
-        <FilterSelect
-          label="Payment Method"
-          value={safeFilters.paymentMethod?.[0] || ""}
-          onChange={(val) =>
-            updateField("paymentMethod", val ? [val] : [])
-          }
-          options={PAYMENT}
-        />
+      <FilterChip interactive>
+        <select
+          className={selectClass(filters.paymentMethod)}
+          value={filters.paymentMethod}
+          onChange={(e) => updateField("paymentMethod", e.target.value)}
+        >
+          <option value="">Payment Method</option>
+          {PAYMENT_METHODS.map((method) => (
+            <option key={method} value={method}>
+              {method}
+            </option>
+          ))}
+        </select>
+      </FilterChip>
 
-        {/* Date placeholder (not wired deeply, but UI matches) */}
-        <FilterSelect
-          label="Date"
-          value={safeFilters.dateFrom || ""}
-          onChange={(val) => updateField("dateFrom", val)}
-          options={["All", "Last 7 days", "Last 30 days", "This year"]}
-        />
+      <DateRangeField
+     
+        dateFrom={filters.dateFrom}
+        dateTo={filters.dateTo}
+        onChange={(range) => onChange({ ...filters, ...range })}
+      />
 
-        {/* Sort by */}
-        <FilterSelect
-          label="Sort by"
-          value={`${safeSort.sortBy}-${safeSort.sortOrder}`}
-          onChange={(val) => {
-            const [sortBy, sortOrder] = val.split("-");
+      <FilterChip className="filter-chip--sort">
+        <span className="sort-prefix">Sort by:</span>
+        <select
+          className="filter-chip-select sort-select"
+          value={`${sort.sortBy}:${sort.sortOrder}`}
+          onChange={(e) => {
+            const [sortBy, sortOrder] = e.target.value.split(":");
             onSortChange({ sortBy, sortOrder });
           }}
-          options={[
-            { label: "Customer Name (A-Z)", value: "customer_name-asc" },
-            { label: "Customer Name (Z-A)", value: "customer_name-desc" },
-            { label: "Date (Newest first)", value: "date-desc" },
-            { label: "Date (Oldest first)", value: "date-asc" },
-          ]}
-          custom
-        />
-      </div>
-
-      {/* Stats cards */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <StatCard
-          title="Total units sold"
-          value={stats.totalUnits.toLocaleString("en-IN")}
-        />
-        <StatCard
-          title="Total Amount"
-          value={`₹${stats.totalAmount.toLocaleString("en-IN")}`}
-          subtitle={`${stats.recordsCount} SRs`}
-        />
-        <StatCard
-          title="Total Discount"
-          value={`₹${stats.totalDiscount.toLocaleString("en-IN")}`}
-          subtitle={`${stats.discountSrs} SRs`}
-        />
-      </div>
-    </div>
-  );
-}
-
-/* Helper components */
-
-function FilterSelect({
-  label,
-  value,
-  onChange,
-  options,
-  mapLabelToValue,
-  custom = false,
-}) {
-  const normalizedOptions = custom
-    ? options
-    : options.map((o) => ({ label: o, value: o }));
-
-  const handleChange = (e) => {
-    const val = e.target.value;
-    if (mapLabelToValue) {
-      const mapped = mapLabelToValue(val);
-      onChange(mapped);
-    } else {
-      onChange(val);
-    }
-  };
-
-  return (
-    <div className="inline-flex flex-col gap-1">
-      <label className="text-[11px] font-medium text-slate-500">
-        {label}
-      </label>
-      <select
-        className="min-w-[140px] rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-        value={value}
-        onChange={handleChange}
-      >
-        <option value="">All</option>
-        {normalizedOptions.map((opt) => (
-          <option key={opt.value} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
-      </select>
-    </div>
-  );
-}
-
-function StatCard({ title, value, subtitle }) {
-  return (
-    <div className="px-4 py-3 bg-white border shadow-sm rounded-xl border-slate-200">
-      <div className="flex items-center justify-between">
-        <p className="flex items-center gap-1 text-xs font-medium text-slate-500">
-          {title}
-          <span className="text-[10px] text-slate-400 border border-slate-300 rounded-full w-4 h-4 flex items-center justify-center">
-            i
-          </span>
-        </p>
-      </div>
-      <p className="mt-2 text-lg font-semibold text-slate-900">{value}</p>
-      {subtitle && (
-        <p className="mt-1 text-[11px] text-slate-500">{subtitle}</p>
-      )}
+        >
+          {SORT_OPTIONS.map((option) => (
+            <option
+              key={`${option.sortBy}-${option.sortOrder}`}
+              value={`${option.sortBy}:${option.sortOrder}`}
+            >
+              {option.label}
+            </option>
+          ))}
+        </select>
+      </FilterChip>
     </div>
   );
 }
