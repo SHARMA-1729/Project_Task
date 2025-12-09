@@ -106,22 +106,54 @@
 
 // backend/src/services/db.service.js
 
+const path = require('path');
 const { Pool } = require('pg');
+require('dotenv').config({ path: path.join(__dirname, '..', '..', '.env') });
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }
-});
+const hasConnectionString = Boolean(process.env.DATABASE_URL);
+const sslRequired =
+  process.env.PGSSLMODE === 'require' ||
+  process.env.PG_SSL === 'true' ||
+  process.env.NODE_ENV === 'production';
+
+let poolConfig;
+
+if (hasConnectionString) {
+  poolConfig = {
+    connectionString: process.env.DATABASE_URL,
+    ssl: sslRequired ? { rejectUnauthorized: false } : undefined,
+  };
+} else {
+  const requiredVars = ['DB_HOST', 'DB_PORT', 'DB_USER', 'DB_PASSWORD', 'DB_NAME'];
+  const missing = requiredVars.filter((key) => !process.env[key]);
+  if (missing.length) {
+    console.error(
+      `FATAL: Missing database env vars: ${missing.join(', ')}. Add them to backend/.env or set DATABASE_URL.`
+    );
+    process.exit(1);
+  }
+
+  poolConfig = {
+    host: process.env.DB_HOST,
+    port: Number(process.env.DB_PORT),
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    ssl: sslRequired ? { rejectUnauthorized: false } : undefined,
+  };
+}
+
+const pool = new Pool(poolConfig);
 
 pool
   .query('SELECT NOW()')
-  .then(res => console.log('✅ PostgreSQL connected:', res.rows[0].now))
-  .catch(err => {
-    console.error('❌ Database connection failed:', err);
+  .then((res) => console.log('✅ PostgreSQL connected:', res.rows[0].now))
+  .catch((err) => {
+    console.error('❌ Database connection failed:', err.message);
     process.exit(1);
   });
 
 module.exports = {
   query: (text, params) => pool.query(text, params),
-  pool
+  pool,
 };
