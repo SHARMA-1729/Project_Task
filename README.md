@@ -57,21 +57,23 @@ https://projecttask-production.up.railway.app
 
 root/
 ├── backend/
-│ ├── src/
-│ │ ├── controllers/
-│ │ ├── services/
-│ │ ├── routes/
-│ │ └── index.js
-│ ├── package.json
-│ └── README.md
+│   ├── src/
+│   │   ├── controllers/
+│   │   ├── services/
+│   │   ├── routes/
+│   │   └── index.js
+│   ├── package.json
+│   └── README.md
 ├── frontend/
-│ ├── public/
-│ ├── src/
-│ │ ├── components/
-│ │ ├── pages/
-│ │ ├── routes/
-│ │ ├── services/
-│ │ ├── hooks/
-│ │ └── main.jsx
-│ ├── package.json
+│   ├── public/
+│   ├── src/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   ├── routes/
+│   │   ├── services/
+│   │   ├── hooks/
+│   │   └── main.jsx
+│   ├── package.json
+│   └── README.md
 └── README.md
+
