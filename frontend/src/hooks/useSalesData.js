@@ -71,7 +71,7 @@ export default function useSalesData({ search, filters, sort, page }) {
     if (filters?.dateTo) params.dateTo = filters.dateTo;
 
     axios
-      .get('http://localhost:5000/api/sales', { params })
+      .get('https://projecttask-production.up.railway.app/api/sales', { params })
       .then((res) => {
         setData(res.data.data);
         setPagination(res.data.pagination);
