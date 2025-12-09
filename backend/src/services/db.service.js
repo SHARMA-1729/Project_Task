@@ -56,47 +56,72 @@
 
 
 
+// // backend/src/services/db.service.js
+
+// const { Pool } = require('pg');
+// const path = require('path');
+
+// // Load .env from backend/.env explicitly
+// require('dotenv').config({
+//   path: path.join(__dirname, '..', '..', '.env'),
+// });
+
+// // --- CRITICAL CHECK ---
+// const dbPassword = process.env.DB_PASSWORD;
+// if (!dbPassword) {
+//   console.error('FATAL ERROR: DB_PASSWORD is not set in environment variables.');
+//   process.exit(1);
+// }
+// // --- END CHECK ---
+
+// const pool = new Pool({
+//   user: process.env.DB_USER,
+//   host: process.env.DB_HOST,
+//   database: process.env.DB_NAME,
+//   password: dbPassword,
+//   port: parseInt(process.env.DB_PORT, 10),
+//   max: 20,
+//   idleTimeoutMillis: 30000,
+//   connectionTimeoutMillis: 2000,
+// });
+
+// // Test DB connection
+// pool
+//   .query('SELECT NOW()')
+//   .then((res) =>
+//     console.log('✅ PostgreSQL connected successfully at:', res.rows[0].now)
+//   )
+//   .catch((err) => {
+//     console.error('❌ Database connection failed:', err.stack);
+//     process.exit(1);
+//   });
+
+// module.exports = {
+//   query: (text, params) => pool.query(text, params),
+//   pool,
+// };
+
+
+
+
 // backend/src/services/db.service.js
 
 const { Pool } = require('pg');
-const path = require('path');
-
-// Load .env from backend/.env explicitly
-require('dotenv').config({
-  path: path.join(__dirname, '..', '..', '.env'),
-});
-
-// --- CRITICAL CHECK ---
-const dbPassword = process.env.DB_PASSWORD;
-if (!dbPassword) {
-  console.error('FATAL ERROR: DB_PASSWORD is not set in environment variables.');
-  process.exit(1);
-}
-// --- END CHECK ---
 
 const pool = new Pool({
-  user: process.env.DB_USER,
-  host: process.env.DB_HOST,
-  database: process.env.DB_NAME,
-  password: dbPassword,
-  port: parseInt(process.env.DB_PORT, 10),
-  max: 20,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false }
 });
 
-// Test DB connection
 pool
   .query('SELECT NOW()')
-  .then((res) =>
-    console.log('✅ PostgreSQL connected successfully at:', res.rows[0].now)
-  )
-  .catch((err) => {
-    console.error('❌ Database connection failed:', err.stack);
+  .then(res => console.log('✅ PostgreSQL connected:', res.rows[0].now))
+  .catch(err => {
+    console.error('❌ Database connection failed:', err);
     process.exit(1);
   });
 
 module.exports = {
   query: (text, params) => pool.query(text, params),
-  pool,
+  pool
 };
