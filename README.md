@@ -1,37 +1,66 @@
 # Retail Sales Management System
 
-## Overview
-A full-stack Retail Sales Management System (React + Vite frontend, Node + Express backend, PostgreSQL on Supabase) that supports advanced search, multi-select filters, sorting and pagination over structured sales data. Built to satisfy the TruEstate SDE intern assignment requirements.
+A full-stack Retail Sales Dashboard built with **React + Vite**, **Node.js + Express**, and **PostgreSQL (Supabase)**.  
+It supports full-text search, multi-select filters, sorting, and pagination on a large sales dataset.
 
-## Live demo
-- Frontend (Vercel): https://project-task-<your-suffix>.vercel.app
-- Backend (Railway): https://projecttask-production.up.railway.app
+This project was designed for the TruEstate SDE Intern Assignment.
 
-> Replace the above demo links with your actual deployed URLs.
+---
 
-## Tech stack
-- Frontend: React, Vite, React Router, Axios
-- Backend: Node.js, Express
-- Database: PostgreSQL (Supabase)
-- Deployment: Vercel (frontend), Railway (backend), Supabase (DB)
-- Dev tools: ESLint, Prettier, Nodemon (backend), Vite (frontend)
+## 🚀 Live Demo
 
-## Features
-- Full-text search (Customer Name, Phone Number) — case-insensitive
-- Multi-select & range filters (Region, Gender, Age range, Product category, Tags, Payment method, Date range)
-- Sorting (Date desc, Quantity, Customer Name A→Z)
-- Pagination (10 items / page, prev/next)
-- Filter + search + sort state preserved across pagination
-- REST API with endpoints for fetching sales and metadata
+### Frontend (Vercel)
+https://your-frontend-url.vercel.app
 
-## Project structure
+### Backend (Railway)
+https://projecttask-production.up.railway.app
+
+> Replace the above link with your actual deployed frontend link.
+
+---
+
+## 🧰 Tech Stack
+
+### Frontend
+- React
+- Vite
+- Axios
+- React Router
+
+### Backend
+- Node.js
+- Express
+
+### Database
+- PostgreSQL (Supabase)
+
+### Deployment
+- Vercel (Frontend)
+- Railway (Backend)
+- Supabase (Database Hosting)
+
+---
+
+## ⭐ Features
+
+- 🔍 **Full-text search** on customer name & phone number  
+- 🎯 **Multi-select filters**: region, gender, age range, product category, tags, payment method  
+- 📅 **Date range filtering**  
+- ↕️ **Sorting**: date, quantity, customer name  
+- 📄 **Pagination** system (page, limit, total count)  
+- 📊 **Sales summary cards**  
+- ⚡ Optimized API queries using PostgreSQL indexes  
+
+---
+
+## 📁 Project Structure
+
 root/
 ├── backend/
 │ ├── src/
 │ │ ├── controllers/
 │ │ ├── services/
 │ │ ├── routes/
-│ │ ├── utils/
 │ │ └── index.js
 │ ├── package.json
 │ └── README.md
@@ -41,11 +70,8 @@ root/
 │ │ ├── components/
 │ │ ├── pages/
 │ │ ├── routes/
-│ │ ├── services/ # axios instance
+│ │ ├── services/
 │ │ ├── hooks/
 │ │ └── main.jsx
 │ ├── package.json
-│ └── README.md
-├── docs/
-│ └── architecture.md
 └── README.md
