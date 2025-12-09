@@ -48,32 +48,13 @@ https://projecttask-production.up.railway.app
 - 📅 **Date range filtering**  
 - ↕️ **Sorting**: date, quantity, customer name  
 - 📄 **Pagination** system (page, limit, total count)  
-- 📊 **Sales summary cards**  
-- ⚡ Optimized API queries using PostgreSQL indexes  
+- 📊 **Sales summary cards**    
 
 ---
 
 ## 📁 Project Structure
 
-root/
-├── backend/
-│   ├── src/
-│   │   ├── controllers/
-│   │   ├── services/
-│   │   ├── routes/
-│   │   └── index.js
-│   ├── package.json
-│   └── README.md
-├── frontend/
-│   ├── public/
-│   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   ├── routes/
-│   │   ├── services/
-│   │   ├── hooks/
-│   │   └── main.jsx
-│   ├── package.json
-│   └── README.md
-└── README.md
+<img width="240" height="546" alt="image" src="https://github.com/user-attachments/assets/4678e750-7fde-4161-b99a-1f6868dc6144" />
+
+
 
