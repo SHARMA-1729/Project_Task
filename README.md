@@ -10,7 +10,7 @@ This project was designed for the TruEstate SDE Intern Assignment.
 ## 🚀 Live Demo
 
 ### Frontend (Vercel)
-https://your-frontend-url.vercel.app
+[https://your-frontend-url.vercel.app](https://project-task-lovat.vercel.app/)
 
 ### Backend (Railway)
 https://projecttask-production.up.railway.app
@@ -55,6 +55,7 @@ https://projecttask-production.up.railway.app
 ## 📁 Project Structure
 
 <img width="240" height="546" alt="image" src="https://github.com/user-attachments/assets/4678e750-7fde-4161-b99a-1f6868dc6144" />
+
 
 
 
