@@ -25,3 +25,27 @@ A full-stack Retail Sales Management System (React + Vite frontend, Node + Expre
 - REST API with endpoints for fetching sales and metadata
 
 ## Project structure
+root/
+├── backend/
+│ ├── src/
+│ │ ├── controllers/
+│ │ ├── services/
+│ │ ├── routes/
+│ │ ├── utils/
+│ │ └── index.js
+│ ├── package.json
+│ └── README.md
+├── frontend/
+│ ├── public/
+│ ├── src/
+│ │ ├── components/
+│ │ ├── pages/
+│ │ ├── routes/
+│ │ ├── services/ # axios instance
+│ │ ├── hooks/
+│ │ └── main.jsx
+│ ├── package.json
+│ └── README.md
+├── docs/
+│ └── architecture.md
+└── README.md
